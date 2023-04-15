@@ -1,0 +1,42 @@
+label{
+    font-size: 20px;
+}
+label{
+    color: black;
+}
+#start{
+    font-size: 20px;
+    background: green;
+    color: white;
+}
+#stopp{
+    font-size: 20px;
+    color: white;
+    background: red;
+}
+#array{
+    background: red;
+}
+#norm{
+    font-size: 20px;
+    text-decoration: None;
+}
+#red{
+    background: red;
+    text-decoration: line-through;
+}
+
+#cyan{
+    background: cyan;
+    text-decoration: line-through;
+}
+
+#yellow{
+    background: yellow;
+    text-decoration: line-through;
+}
+
+#orange{
+    background: orange;
+    text-decoration: line-through;
+}
