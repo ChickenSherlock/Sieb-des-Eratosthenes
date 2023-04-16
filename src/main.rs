@@ -119,7 +119,7 @@ fn build_ui(app: &Application) {
                     let mut bool_array = vec![true;length as usize];
 
                     bool_array[0] = false;
-
+                    position_sender_clone.send((0,0)).expect("failed sending");
                     for number in 1..length {
                         if number==1{continue}
                         if bool_array[number as usize]{
