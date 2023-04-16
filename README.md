@@ -6,3 +6,6 @@
 <li>Performance Vergleich in verschiedenen Sprachen</li>
 <li>Der Alogrithmus in <a href="comparison/python_sieb.py">Python</a>, <a href="comparison/cpp_sieb.cpp">C++</a>, <a href="comparison/rust_sieb.rs">Rust</a></li>
 </ul>
+
+<h2>Demo</h2>
+<img src="images/demo.gif">

@@ -1,10 +1,8 @@
-use std::borrow::Borrow;
 use std::thread;
 use std::time::Duration;
 use gtk::gdk::Screen;
-use gtk::{Application, ApplicationWindow, Entry, Label, Grid, Button, Justification, StyleContext, CssProvider, glib, false_, Scrollable, ScrolledWindow};
+use gtk::{Application, ApplicationWindow, Entry, Label, Grid, Button, Justification, StyleContext, CssProvider, glib, ScrolledWindow};
 use gtk::glib::MainContext;
-use gtk::pango::WrapMode;
 use gtk::prelude::*;
 
 fn build_ui(app: &Application) {
@@ -24,7 +22,6 @@ fn build_ui(app: &Application) {
         .yalign(0.0)
         .wrap(true)
         .max_width_chars(30)
-        .wrap_mode(WrapMode::Word)
         .halign(gtk::Align::Start)
         .label("Liste:")
         .build();
@@ -67,7 +64,7 @@ fn build_ui(app: &Application) {
     main_box.attach(&delay_input,1,2,1,1);
     main_box.attach(&go_button,2,2,1,1);
 
-    let (position_sender, position_receiver) = MainContext::channel::<(i32,i32)>(gtk::glib::Priority::DEFAULT);
+    let (position_sender, position_receiver) = MainContext::channel::<(i32,i32)>(glib::Priority::DEFAULT);
 
     go_button.connect_button_press_event(move|_,_|{
         let mut exit = false;
@@ -125,19 +122,18 @@ fn build_ui(app: &Application) {
 
                     for number in 1..length {
                         if number==1{continue}
-                        println!("{:?}", number);
                         if bool_array[number as usize]{
                             for i in (number * number..length +1).step_by(number as usize) {
                                 thread::sleep(Duration::from_millis(delay as u64));
                                 bool_array[number as usize] = false;
-                                position_sender_clone.send((i-1,0));
+                                position_sender_clone.send((i-1,0)).expect("failed sending");
 
                             }
                         }
 
                     };
-                    position_sender_clone.send((-1,1));
-                    glib::Continue(true)
+                    position_sender_clone.send((-1,1)).expect("failed sending");
+                    Continue(true)
                 });
             };
         }else {
@@ -152,7 +148,7 @@ fn build_ui(app: &Application) {
         if position.0 != -1{
             array_grid.children()[((array_grid.children().len() as i32 -1)-position.0) as usize].set_widget_name("red");
         }else { status_label.set_label("Status: Done") }
-        glib::Continue(true)
+        Continue(true)
     });
 
     let window = ApplicationWindow::builder()
@@ -165,7 +161,7 @@ fn build_ui(app: &Application) {
         .build();
     let provider = CssProvider::new();
 
-    provider.load_from_data(include_str!("style.css").as_ref());
+    provider.load_from_data(include_str!("style.css").as_ref()).expect("Failed loading CSS");
 
 
     StyleContext::add_provider_for_screen(
