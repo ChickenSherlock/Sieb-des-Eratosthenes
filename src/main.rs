@@ -8,7 +8,6 @@ use gtk::pango::WrapMode;
 use gtk::prelude::*;
 
 fn build_ui(app: &Application) {
-
     let go_button = Button::builder()
         .label("Start")
         .name("start")
@@ -67,27 +66,29 @@ fn build_ui(app: &Application) {
     main_box.attach(&length_entry,0,2,1,1);
     main_box.attach(&delay_input,1,2,1,1);
     main_box.attach(&go_button,2,2,1,1);
-    let (position_sender, position_receiver) = MainContext::channel::<(i32,i32)>(gtk::glib::Priority::DEFAULT);
 
+    let (position_sender, position_receiver) = MainContext::channel::<(i32,i32)>(gtk::glib::Priority::DEFAULT);
 
     go_button.connect_button_press_event(move|_,_|{
         let mut exit = false;
         if &go_button_clone.label().unwrap() as &str == "Start"{
             exit = false;
+
             let length = match length_entry.buffer().text().parse::<i32>() {
                 Ok(n) => n,
                 Err(_) => {
                     0
                 }
             };
+
             let delay = match delay_input.buffer().text().parse::<i32>() {
                 Ok(n) => n,
                 Err(_) => {
                     -1
                 }
             };
-            if length > 0 && delay>=0{
 
+            if length > 0 && delay>=0{
                 go_button_clone.set_label("Stopp");
                 go_button_clone.set_widget_name("stopp");
                 status_label_clone.set_label("Status: Running");
@@ -97,22 +98,23 @@ fn build_ui(app: &Application) {
                 for widget in iter {
                     array_grid_clone.remove(&widget)
                 }
+
                 for i in 1..length+1 {
                     let number_label = Label::builder()
                         .label(i.to_string())
                         .name("norm")
                         .build();
-
-
                     array_grid_clone.attach(&number_label,col,row,1,1);
-                    println!("{:?}",(col,row));
-                    number_label.show();
+
                     if i%10 == 0 {
                         row +=1;
                         col = 0
                     }else { col += 1 };
-                }
-                array_label.set_line_wrap(true);
+                }array_grid_clone.show_all();
+
+
+
+
                 let ps = position_sender.clone();
 
                 thread::spawn(move||{
@@ -120,7 +122,6 @@ fn build_ui(app: &Application) {
                     let mut bool_array = vec![true;length as usize];
 
                     bool_array[0] = false;
-                    //position_sender_clone.send((0,0));
 
                     for number in 1..length {
                         if number==1{continue}
@@ -138,8 +139,6 @@ fn build_ui(app: &Application) {
                     position_sender_clone.send((-1,1));
                     glib::Continue(true)
                 });
-
-
             };
         }else {
             go_button_clone.set_label("Start");
@@ -153,10 +152,9 @@ fn build_ui(app: &Application) {
         if position.0 != -1{
             array_grid.children()[((array_grid.children().len() as i32 -1)-position.0) as usize].set_widget_name("red");
         }else { status_label.set_label("Status: Done") }
-
-
         glib::Continue(true)
     });
+
     let window = ApplicationWindow::builder()
         .application(app)
         .resizable(false)
@@ -166,6 +164,7 @@ fn build_ui(app: &Application) {
         .title("Sieb des Eratosthenes")
         .build();
     let provider = CssProvider::new();
+
     provider.load_from_data(include_str!("style.css").as_ref());
 
 
@@ -179,12 +178,7 @@ fn build_ui(app: &Application) {
 
 
 fn main() {
-
-
     let app = Application::builder().application_id("me.ChickenSherlock.visualisierung").build();
-
-
-
     app.connect_activate(build_ui);
     app.run();
 }
