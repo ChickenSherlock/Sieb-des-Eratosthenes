@@ -64,7 +64,7 @@ std::vector<int> improved_sieve(int n) {
 
 int main() {
 
-    int n = 1000000000;
+    int n = 100000000;
 
     auto start = std::chrono::high_resolution_clock::now();
     std::vector<int> out = basic_sieve(n);

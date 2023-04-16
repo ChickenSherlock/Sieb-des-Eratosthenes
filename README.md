@@ -9,3 +9,5 @@
 
 <h2>Demo</h2>
 <img src="images/demo.gif">
+<h2>Performance Vergleich</h2>
+<img src="images/performance.png">
