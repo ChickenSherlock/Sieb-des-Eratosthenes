@@ -24,7 +24,14 @@ jobs:
       - name: Install GCC for Windows
         run: sudo apt-get install -y mingw-w64
 
-
+      - name: Install dependencies
+        run: |
+          sudo pacman -Sy
+          sudo pacman -S mingw-w64-gcc mingw-w64-freetype2-bootstrap mingw-w64-cairo-bootstrap
+          sudo pacman -S mingw-w64-harfbuzz
+          sudo pacman -S mingw-w64-pango
+          sudo pacman -S mingw-w64-poppler
+          sudo pacman -S mingw-w64-gtk3
 
       - name: Setup Rust for Windows
         uses: actions-rs/toolchain@v1
