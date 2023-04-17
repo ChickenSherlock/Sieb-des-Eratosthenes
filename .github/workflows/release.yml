@@ -1,11 +1,16 @@
+name: 🏁 Windows
 on:
   push:
-  
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
 jobs:
   container:
     runs-on: ubuntu-22.04
     container:
-      image: rust-crosscompile:latest
+      image: ghcr.io/piegamesde/gtk4-cross:gtk-4.8
     steps:
       - uses: actions/checkout@v1
       - name: Install additional dependencies
@@ -33,5 +38,33 @@ jobs:
           export PKG_CONFIG_PATH=/usr/lib64/pkgconfig:/usr/share/pkgconfig:$MINGW_PREFIX/lib/pkgconfig/:/usr/x86_64-w64-mingw32/lib/pkgconfig/
           cargo build --target=x86_64-pc-windows-gnu --release --locked
           mkdir -p package
-          cp target/x86_64-pc-windows-gnu/release/czkawka_gui.exe package/
-          cp target/x86_64-pc-windows-gnu/release/czkawka_cli.exe package/
+          cp target/x86_64-pc-windows-gnu/release/visualisierung.exe package/
+          cp target/x86_64-pc-windows-gnu/release/visualisierung.exe package/
+      - name: Package
+        run: |
+          #!/bin/bash
+          set -euo pipefail
+          cp -t package $(pds -vv -f package/*.exe)
+          # Add gdbus which is recommended on Windows (why?)
+          cp $MINGW_PREFIX/bin/gdbus.exe package
+          # Handle the glib schema compilation as well
+          glib-compile-schemas $MINGW_PREFIX/share/glib-2.0/schemas/
+          mkdir -p package/share/glib-2.0/schemas/
+          cp -T $MINGW_PREFIX/share/glib-2.0/schemas/gschemas.compiled package/share/glib-2.0/schemas/gschemas.compiled
+          # Pixbuf stuff, in order to get SVGs (scalable icons) to load
+          mkdir -p package/lib/gdk-pixbuf-2.0
+          cp -rT $MINGW_PREFIX/lib/gdk-pixbuf-2.0 package/lib/gdk-pixbuf-2.0
+          cp -f -t package $(pds -vv -f $MINGW_PREFIX/lib/gdk-pixbuf-2.0/2.10.0/loaders/*)
+          find package -iname "*.dll" -or -iname "*.exe" -type f -exec mingw-strip {} +
+          cd package/share
+          wget2 https://github.com/qarmin/czkawka/files/10832192/gtk4_theme.zip
+          unzip gtk4_theme.zip
+          rm gtk4_theme.zip
+          cd ../..
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: sieb-windows-${{ github.sha }}
+          path: |
+            ./package
+          if-no-files-found: error
