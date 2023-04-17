@@ -6,6 +6,7 @@ use gtk::{Application, ApplicationWindow, Entry, Label, Grid, Button, Justificat
 use gtk::glib::MainContext;
 use gtk::prelude::*;
 
+
 fn build_ui(app: &Application) {
     let go_button = Button::builder()
         .label("Start")
