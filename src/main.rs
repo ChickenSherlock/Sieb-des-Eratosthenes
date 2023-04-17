@@ -93,6 +93,15 @@ fn build_ui(app: &Application) {
                 let mut col = 0;
 
 
+                let mut first_child = array_grid_clone.first_child();
+                loop {
+                    if  first_child.is_some(){
+                        array_grid_clone.remove(&first_child.unwrap());
+                        first_child = array_grid_clone.first_child()
+                    }else { break }
+                }
+
+
                 for i in 1..length+1 {
                     let number_label = Label::builder()
                         .label(i.to_string())
@@ -116,14 +125,14 @@ fn build_ui(app: &Application) {
                     let mut bool_array = vec![true;length as usize];
 
                     bool_array[0] = false;
-                    position_sender_clone.send((0,0)).expect("failed sending");
+                    position_sender_clone.send((0,length)).expect("failed sending");
                     for number in 1..length {
                         if number==1{continue}
                         if bool_array[number as usize]{
                             for i in (number * number..length +1).step_by(number as usize) {
                                 thread::sleep(Duration::from_millis(delay as u64));
                                 bool_array[number as usize] = false;
-                                position_sender_clone.send((i-1,0)).expect("failed sending");
+                                position_sender_clone.send((i-1,length)).expect("failed sending");
 
                             }
                         }
@@ -141,7 +150,13 @@ fn build_ui(app: &Application) {
 
     position_receiver.attach(None,move|position|{
         if position.0 != -1{
-
+            let mut counter = 0;
+            for child in array_grid.observe_children().into_iter(){
+                if counter == position.0{
+                    child.unwrap().set_property("name","red")
+                }
+                counter += 1
+            }
         }else { status_label.set_label("Status: Done") }
         Continue(true)
     });
