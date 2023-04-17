@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-publish:
     runs-on: windows-latest
+    env:
+      PKG_CONFIG_PATH: /usr/i686-w64-mingw32/lib/pkgconfig
     
     steps:
       - name: Checkout
