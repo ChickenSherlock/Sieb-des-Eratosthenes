@@ -1,3 +1,4 @@
+#![windows_subsystem = "windows"]
 use std::thread;
 use std::time::Duration;
 use gtk::gdk::Screen;
