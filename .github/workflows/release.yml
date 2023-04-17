@@ -17,12 +17,21 @@ jobs:
         
       - name: install 
         run: rustup target add x86_64-pc-windows-gnu
+      - name: install pango
+        run: pacaur -S mingw-w64-pango
+      - name: install cairo
+        run: pacaur -S mingw-w64-gcc mingw-w64-freetype2-bootstrap mingw-w64-cairo-bootstrap
+      - name: install harfbuzz
+        run: pacaur -S mingw-w64-harfbuzz
+      - name: install poppler
+        run: pacaur -S mingw-w64-poppler
+      
 
       - name: Setup Rust for Windows
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: stable-x86_64-pc-windows-gnu
+          toolchain: x86_64-pc-windows-gnu
 
       - name: Install GTK3 dependencies for Windows
         run: sudo apt-get install -y mingw-w64
@@ -51,6 +60,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/x86_64-pc-windows-gnu/release/<your-app-name>.exe
+          asset_path: ./target/x86_64-pc-windows-gnu/release/test.exe
           asset_name: test.exe
           asset_content_type: application/octet-stream
