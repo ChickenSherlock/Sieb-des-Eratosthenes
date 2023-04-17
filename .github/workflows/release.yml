@@ -30,14 +30,6 @@ jobs:
             mingw64/mingw-w64-x86_64-winpthreads-git
             msys/make
 
-      - name: find path
-        shell: msys2 {0}
-        run: |
-          # To find libpthread.dll on msys2:
-          export LIBRARY_PATH=/mingw64/x86_64-w64-mingw32/lib/
-          ./configure --disable-static-pic --disable-static --with-GL=no --enable-build=${{ matrix.build_type }} --prefix=$PWD/prefix
-          make all install
-
       - name: Setup Rust for Windows
       
         uses: actions-rs/toolchain@v1
