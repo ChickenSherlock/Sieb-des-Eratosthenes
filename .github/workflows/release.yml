@@ -30,7 +30,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: x86_64-pc-windows-gnu
+          toolchain: stable-gnu
 
       - name: Install GTK3 dependencies for Windows
         run: sudo apt-get install -y mingw-w64
