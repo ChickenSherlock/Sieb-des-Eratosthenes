@@ -1,1 +1,37 @@
-
+on:
+  push:
+  
+jobs:
+  container:
+    runs-on: ubuntu-22.04
+    container:
+      image: https://github.com/etrombly/rust-crosscompile
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install additional dependencies
+        # gio is for the build script
+        run: dnf install wget2 unzip mingw64-bzip2.noarch mingw64-poppler mingw64-poppler-glib mingw32-python3 rust-gio-devel adwaita-icon-theme -y && dnf clean all -y
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: x86_64-pc-windows-gnu
+      - name: Cache ~/.cargo
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo
+          key: windows-dotcargo
+      - name: Cache cargo build
+        uses: actions/cache@v1
+        with:
+          path: target
+          key: windows-build-target
+      - name: Cross compile for Windows
+        run: |
+          #!/bin/bash
+          set -euo pipefail
+          export PKG_CONFIG_PATH=/usr/lib64/pkgconfig:/usr/share/pkgconfig:$MINGW_PREFIX/lib/pkgconfig/:/usr/x86_64-w64-mingw32/lib/pkgconfig/
+          cargo build --target=x86_64-pc-windows-gnu --release --locked
+          mkdir -p package
+          cp target/x86_64-pc-windows-gnu/release/czkawka_gui.exe package/
+          cp target/x86_64-pc-windows-gnu/release/czkawka_cli.exe package/
