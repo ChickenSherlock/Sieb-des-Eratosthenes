@@ -5,7 +5,7 @@ jobs:
   container:
     runs-on: ubuntu-22.04
     container:
-      image: https://github.com/etrombly/rust-crosscompile
+      image: rust-crosscompile:latest
     steps:
       - uses: actions/checkout@v1
       - name: Install additional dependencies
