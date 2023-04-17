@@ -1,7 +1,7 @@
 #![windows_subsystem = "windows"]
 use std::thread;
 use std::time::Duration;
-use gtk::gdk::Screen;
+use gtk::gdk::Display;
 use gtk::{Application, ApplicationWindow, Entry, Label, Grid, Button, Justification, StyleContext, CssProvider, glib, ScrolledWindow};
 use gtk::glib::MainContext;
 use gtk::prelude::*;
@@ -68,10 +68,8 @@ fn build_ui(app: &Application) {
 
     let (position_sender, position_receiver) = MainContext::channel::<(i32,i32)>(glib::Priority::DEFAULT);
 
-    go_button.connect_button_press_event(move|_,_|{
-        let mut exit = false;
+    go_button.connect_clicked(move |_|{
         if &go_button_clone.label().unwrap() as &str == "Start"{
-            exit = false;
 
             let length = match length_entry.buffer().text().parse::<i32>() {
                 Ok(n) => n,
@@ -93,10 +91,7 @@ fn build_ui(app: &Application) {
                 status_label_clone.set_label("Status: Running");
                 let mut row = 0;
                 let mut col = 0;
-                let iter = array_grid_clone.children();
-                for widget in iter {
-                    array_grid_clone.remove(&widget)
-                }
+
 
                 for i in 1..length+1 {
                     let number_label = Label::builder()
@@ -109,7 +104,7 @@ fn build_ui(app: &Application) {
                         row +=1;
                         col = 0
                     }else { col += 1 };
-                }array_grid_clone.show_all();
+                }array_grid_clone.show();
 
 
 
@@ -140,15 +135,13 @@ fn build_ui(app: &Application) {
             };
         }else {
             go_button_clone.set_label("Start");
-            exit = true;
             go_button_clone.set_widget_name("start")
-        }
-        Inhibit(true)
+        };
     });
 
     position_receiver.attach(None,move|position|{
         if position.0 != -1{
-            array_grid.children()[((array_grid.children().len() as i32 -1)-position.0) as usize].set_widget_name("red");
+
         }else { status_label.set_label("Status: Done") }
         Continue(true)
     });
@@ -161,17 +154,18 @@ fn build_ui(app: &Application) {
         .child(&main_box)
         .title("Sieb des Eratosthenes")
         .build();
+
+    window.show();
+
     let provider = CssProvider::new();
+    provider.load_from_data(include_str!("style.css").as_ref());
 
-    provider.load_from_data(include_str!("style.css").as_ref()).expect("Failed loading CSS");
-
-
-    StyleContext::add_provider_for_screen(
-        &Screen::default().expect("Could not connect to a display."),
+    // Add the provider to the default screen
+    StyleContext::add_provider_for_display(
+        &Display::default().expect("Could not connect to a display."),
         &provider,
         gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
     );
-    window.show_all();
 }
 
 
