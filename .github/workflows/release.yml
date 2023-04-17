@@ -26,7 +26,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo pacman -Sy
           sudo pacman -S mingw-w64-gcc mingw-w64-freetype2-bootstrap mingw-w64-cairo-bootstrap
           sudo pacman -S mingw-w64-harfbuzz
           sudo pacman -S mingw-w64-pango
